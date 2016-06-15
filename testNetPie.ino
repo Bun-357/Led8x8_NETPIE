@@ -48,29 +48,57 @@ void onMsghandler(char *topic, uint8_t* msg, unsigned int msglen) {
   //    data[6] = b.substring((b.indexOf('g') + 1), b.indexOf('h')).toInt();
   //    data[7] = b.substring((b.indexOf('h') + 1), b.indexOf('i')).toInt();
   int y = 0;
-  for(int i =0;i<msglen;i++){
-     char inChar = (char)msg[i];
+  for (int i = 0; i < msglen; i++) {
+    char inChar = (char)msg[i];
     b += inChar;
-    if(msg[i] ==  44 ){
-      data[y] = b.toInt();
-      b = "";
-      y++;
-
-      if(y == 7){
-        y = 0;
+    if (msg[i] ==  44 ) {
+      if (y < 8) {
+        data[y] = b.toInt();
+        b = "";
       }
+      y++;
+      // try sendback to who sending
+      if (y > 7) {
+        Serial.print("  last   --> ");
+        for (int x = i+1; x < msglen; x++) {
+          char inChar = (char)msg[x];
+          b += inChar;
+        }
+        Serial.println(b);
+        b.toCharArray(cstr, 100);
+        datatoSend = ALIAS;
+        datatoSend = String(datatoSend + " receive data"); // concatenating two strings
+        datatoSend.toCharArray(cstr2, 100);
+        microgear.chat(cstr,cstr2);
+        b = "";
+      }
+
+
+
+
+      //      if (y == 8) {
+      //        b.toCharArray(cstr, 100);
+      //        microgear.chat(cstr, "ok");
+      //        //y = 0;
+      //        b = "";
+      //      }
+
+
+      //      if (y == 9) {
+      //        y = 0;
+      //      }
     }
   }
 
-//  data[0] = (int)msg[0];
-//  data[1] = (int)msg[1];
-//  data[2] = (int)msg[2];
-//  data[3] = (int)msg[3];
-//
-//  data[4] = (int)msg[4];
-//  data[5] = (int)msg[5];
-//  data[6] = (int)msg[6];
-//  data[7] = (int)msg[7];
+  //  data[0] = (int)msg[0];
+  //  data[1] = (int)msg[1];
+  //  data[2] = (int)msg[2];
+  //  data[3] = (int)msg[3];
+  //
+  //  data[4] = (int)msg[4];
+  //  data[5] = (int)msg[5];
+  //  data[6] = (int)msg[6];
+  //  data[7] = (int)msg[7];
 
   //aliasTx = b.substring((b.indexOf('i') + 1), b.indexOf('j'));
 
@@ -78,7 +106,7 @@ void onMsghandler(char *topic, uint8_t* msg, unsigned int msglen) {
   //b.toCharArray(cstr,100);
   //aliasTx.toCharArray(cstr2,100);
 
-  //Serial.print("Send from : ");
+  //Serial.println(cstr);
   Serial.println(data[0]);
   Serial.println(data[1]);
   Serial.println(data[2]);
